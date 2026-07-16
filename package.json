@@ -1,6 +1,6 @@
 {
   "name": "starling-archive",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A local-first Electron studio for AI characters, shared lore, rooms, and role-playing scenarios powered by Codex Luna.",
   "main": "electron/main.cjs",
   "author": "Nicholas Benson",
@@ -14,7 +14,7 @@
     "test:electron": "npm run build && node scripts/electron-smoke.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "dist": "npm run build && electron-builder",
-    "dist:mac": "npm run build && electron-builder --mac --publish never",
+    "dist:mac": "npm run build && electron-builder --mac --x64 --arm64 --publish never",
     "dist:win": "npm run build && electron-builder --win --publish never"
   },
   "dependencies": {
@@ -55,10 +55,16 @@
     ],
     "mac": {
       "category": "public.app-category.entertainment",
-      "target": ["dmg", "zip"]
+      "target": [
+        "dmg",
+        "zip"
+      ]
     },
     "win": {
-      "target": ["nsis", "portable"]
+      "target": [
+        "nsis",
+        "portable"
+      ]
     },
     "nsis": {
       "oneClick": false,
