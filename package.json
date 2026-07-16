@@ -14,8 +14,8 @@
     "test:electron": "npm run build && node scripts/electron-smoke.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "dist": "npm run build && electron-builder",
-    "dist:mac": "npm run build && electron-builder --mac",
-    "dist:win": "npm run build && electron-builder --win"
+    "dist:mac": "npm run build && electron-builder --mac --publish never",
+    "dist:win": "npm run build && electron-builder --win --publish never"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "^5.2.6",
