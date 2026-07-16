@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" role="img" aria-labelledby="title desc">
+  <title id="title">Starling Archive preview</title>
+  <desc id="desc">A dark cosmic interface with a sidebar and an observatory dashboard.</desc>
+  <defs>
+    <radialGradient id="sky"><stop stop-color="#342873"/><stop offset=".45" stop-color="#121120"/><stop offset="1" stop-color="#08080e"/></radialGradient>
+    <linearGradient id="panel" x2="1" y2="1"><stop stop-color="#1b1730"/><stop offset="1" stop-color="#0c0c14"/></linearGradient>
+  </defs>
+  <rect width="1440" height="900" fill="#08080e"/>
+  <circle cx="1190" cy="90" r="500" fill="url(#sky)" opacity=".7"/>
+  <g fill="#fff" opacity=".42"> <circle cx="510" cy="93" r="1"/><circle cx="732" cy="140" r="1"/><circle cx="990" cy="72" r="1"/><circle cx="1300" cy="245" r="1"/><circle cx="1165" cy="390" r="1"/><circle cx="855" cy="330" r="1"/><circle cx="560" cy="481" r="1"/></g>
+  <rect width="235" height="900" fill="#09090f" stroke="#252331"/>
+  <circle cx="39" cy="50" r="17" fill="#6257bb" stroke="#b9b2ff"/><text x="70" y="50" fill="#f6f3ff" font-family="Georgia" font-size="23">Starling</text><text x="70" y="66" fill="#817d91" font-family="Arial" font-size="8" letter-spacing="3">ARCHIVE</text>
+  <g font-family="Arial" font-size="12" fill="#918e9e"><text x="28" y="138" fill="#fff">✦  Observatory</text><text x="28" y="187">✧  Characters</text><text x="28" y="236">▧  Lore Library</text><text x="28" y="285">◈  Scenarios</text><text x="28" y="334">◎  Rooms</text><text x="28" y="383">◌  Threads</text></g>
+  <text x="315" y="92" fill="#d5a94e" font-family="Arial" font-size="9" letter-spacing="3">YOUR PRIVATE STORY STUDIO</text><text x="315" y="145" fill="#f6f3ff" font-family="Georgia" font-size="56">Observatory</text><text x="315" y="175" fill="#9895aa" font-family="Arial" font-size="13">Pick up a conversation or open a new door.</text>
+  <rect x="315" y="220" width="1035" height="395" rx="2" ry="2" fill="url(#panel)" stroke="#37304f"/>
+  <text x="380" y="295" fill="#c9c4d7" font-family="Arial" font-size="10" letter-spacing="2">●  YOUR ARCHIVE IS READY</text><text x="380" y="370" fill="#fff" font-family="Georgia" font-size="64">Every voice.</text><text x="380" y="430" fill="#fff" font-family="Georgia" font-size="64">Every world.</text><text x="380" y="490" fill="#b9b2ff" font-family="Georgia" font-size="64" font-style="italic">Yours to direct.</text><text x="380" y="535" fill="#aaa6b7" font-family="Arial" font-size="13">Create a character, enter a world, or bring an unfinished story back into focus.</text>
+  <ellipse cx="1115" cy="410" rx="185" ry="70" fill="none" stroke="#8174f2" opacity=".45" transform="rotate(25 1115 410)"/><circle cx="1115" cy="410" r="48" fill="#6658bd" stroke="#b9b2ff"/><circle cx="1263" cy="495" r="5" fill="#54a8ff"/>
+  <text x="315" y="682" fill="#d5a94e" font-family="Arial" font-size="8" letter-spacing="2">CONTINUE</text><text x="315" y="719" fill="#f6f3ff" font-family="Georgia" font-size="30">Recent threads</text><line x1="315" y1="742" x2="1350" y2="742" stroke="#262431"/><circle cx="337" cy="780" r="18" fill="#26213f"/><text x="372" y="779" fill="#fff" font-family="Arial" font-size="12">The Last Observatory</text><text x="372" y="800" fill="#9895aa" font-family="Arial" font-size="10">Narrator: The final sunset has lingered for three days…</text><line x1="315" y1="824" x2="1350" y2="824" stroke="#262431"/>
+</svg>

@@ -1,0 +1,68 @@
+{
+  "name": "starling-archive",
+  "version": "0.1.0",
+  "description": "A local-first Electron studio for AI characters, shared lore, rooms, and role-playing scenarios powered by Codex Luna.",
+  "main": "electron/main.cjs",
+  "author": "Nicholas Benson",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5173 electron .\"",
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:electron": "npm run build && node scripts/electron-smoke.mjs",
+    "preview": "vite preview --host 127.0.0.1",
+    "dist": "npm run build && electron-builder",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:win": "npm run build && electron-builder --win"
+  },
+  "dependencies": {
+    "@fontsource-variable/manrope": "^5.2.6",
+    "@fontsource/cormorant-garamond": "^5.2.6",
+    "framer-motion": "^12.23.9",
+    "lucide-react": "^0.468.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.3",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "electron": "^33.3.1",
+    "electron-builder": "^25.1.8",
+    "playwright-core": "^1.54.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "vitest": "^2.1.8",
+    "wait-on": "^8.0.1"
+  },
+  "build": {
+    "appId": "com.nicholasbenson.starlingarchive",
+    "productName": "Starling Archive",
+    "icon": "build/icon.png",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.entertainment",
+      "target": ["dmg", "zip"]
+    },
+    "win": {
+      "target": ["nsis", "portable"]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
