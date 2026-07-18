@@ -12,6 +12,8 @@ const app = await electron.launch({ executablePath, args: [`--user-data-dir=${te
 try {
   const window = await app.firstWindow()
   await window.waitForSelector('text=Every voice.')
+  await window.getByLabel('Huntsville Alabama time and current weather').waitFor()
+  await window.getByLabel('Huntsville Alabama time and current weather').locator('time').waitFor()
   await window.getByRole('button', { name: 'Characters' }).click()
   await window.waitForSelector('text=Lyra Vale')
   await window.getByRole('button', { name: 'New Character' }).click()
@@ -28,8 +30,11 @@ try {
   await window.waitForSelector('text=The Astral Tide')
   await window.getByRole('button', { name: 'About & Guide' }).click()
   await window.waitForSelector('text=A private stage for impossible conversations.')
+  await window.getByRole('button', { name: 'Settings' }).click()
+  await window.getByRole('button', { name: 'Update to latest release' }).waitFor()
+  await window.getByText('Version 0.2.0', { exact: false }).waitFor()
   await window.screenshot({ path: path.join(root, 'artifacts', 'electron-smoke.png'), fullPage: true })
-  console.log('Electron smoke test passed: navigation, character creation, persistence, seeded lore, and About guide rendered.')
+  console.log('Electron smoke test passed: navigation, persistence, Huntsville clock/weather, About guide, and desktop updater rendered.')
 } finally {
   await app.close()
 }

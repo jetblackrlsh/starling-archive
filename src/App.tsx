@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  Archive, ArrowLeft, BookOpen, Bot, Check, ChevronRight, CircleHelp, Compass, Download,
+  Archive, ArrowLeft, BookOpen, Bot, Check, ChevronRight, CircleHelp, CloudSun, Compass, Download,
   Feather, FilePlus2, Github, Import, Info, Library, LoaderCircle, MessageCircle, MoreHorizontal,
   Plus, Radio, RefreshCw, Save, Search, Send, Settings, Sparkles, SquarePen, Trash2, Users,
   WandSparkles, X,
@@ -8,8 +8,10 @@ import {
 import { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { colors, createId, initialVault } from './data'
 import { activeLore, buildGenerationPrompt } from './lib/prompt'
+import { formatHuntsvilleDateTime } from './lib/huntsville'
 import type {
-  Character, CodexStatus, LoreModule, Message, NavigationView, Room, Scenario, StoryThread, Vault,
+  AppInfo, Character, CodexStatus, LoreModule, Message, NavigationView, Room, Scenario, StoryThread,
+  UpdateProgress, Vault, WeatherInfo,
 } from './types'
 
 const navItems: { id: NavigationView; label: string; icon: typeof Compass }[] = [
@@ -132,6 +134,7 @@ function App() {
         <div className="sidebar-bottom">
           <NavButton item={{ id: 'settings', label: 'Settings', icon: Settings }} active={view === 'settings'} onClick={() => setView('settings')} />
           <NavButton item={{ id: 'about', label: 'About & Guide', icon: CircleHelp }} active={view === 'about'} onClick={() => setView('about')} />
+          <HuntsvilleWidget />
           <div className="model-chip"><span className="live-dot" /><div><strong>Luna 5.6</strong><small>Low reasoning</small></div></div>
         </div>
       </aside>
@@ -170,6 +173,42 @@ function BrandMark() {
 function NavButton({ item, active, onClick }: { item: { id: NavigationView; label: string; icon: typeof Compass }; active: boolean; onClick: () => void }) {
   const Icon = item.icon
   return <button className={`nav-button ${active ? 'active' : ''}`} onClick={onClick}><Icon size={18} strokeWidth={1.7} /><span>{item.label}</span>{active && <motion.span layoutId="nav-indicator" className="nav-indicator" />}</button>
+}
+
+function HuntsvilleWidget() {
+  const [now, setNow] = useState(() => new Date())
+  const [weather, setWeather] = useState<WeatherInfo | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
+  const [unavailable, setUnavailable] = useState(false)
+
+  const refreshWeather = async (force = false) => {
+    setRefreshing(true)
+    try {
+      setWeather(await window.starling.app.currentWeather(force))
+      setUnavailable(false)
+    } catch {
+      setUnavailable(true)
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
+  useEffect(() => {
+    refreshWeather()
+    const clockTimer = window.setInterval(() => setNow(new Date()), 1000)
+    const weatherTimer = window.setInterval(() => refreshWeather(), 15 * 60 * 1000)
+    return () => {
+      window.clearInterval(clockTimer)
+      window.clearInterval(weatherTimer)
+    }
+  }, [])
+
+  return <section className="huntsville-widget" data-weather-tone={weather?.tone || 'unknown'} aria-label="Huntsville Alabama time and current weather">
+    <div className="huntsville-location"><span>Huntsville · Alabama</span><button aria-label="Refresh Huntsville weather" onClick={() => refreshWeather(true)} disabled={refreshing}><RefreshCw className={refreshing ? 'spin' : ''} size={13} /></button></div>
+    <time dateTime={now.toISOString()}>{formatHuntsvilleDateTime(now)}</time>
+    <div className="weather-reading" aria-live="polite"><CloudSun size={18} /><strong>{weather ? `${weather.temperature}${weather.temperatureUnit}` : '--°F'}</strong><span>{unavailable ? 'Weather unavailable' : weather?.condition || 'Loading conditions…'}</span></div>
+    <small>{weather?.stale ? 'Saved conditions · reconnect to refresh' : 'Current Huntsville conditions'}</small>
+  </section>
 }
 
 function PageHeader({ view }: { view: NavigationView }) {
@@ -319,7 +358,51 @@ function SettingsPage({ vault, setVault }: { vault: Vault; setVault: (updater: (
   useEffect(() => { check() }, [])
   const exportData = async () => { const path = await window.starling.database.export(); if (path) setNotice(`Archive exported to ${path}`) }
   const importData = async () => { const data = await window.starling.database.import(); if (data) { setVault(() => data); setNotice('Archive imported successfully.') } }
-  return <div className="settings-layout"><section className="settings-section"><div className="settings-heading"><div><h2>Codex connection</h2><p>Starling calls the local Codex CLI with a locked model and reasoning profile.</p></div><span className={`status-pill ${status?.available && status.authenticated ? 'ok' : 'warn'}`}>{status?.available && status.authenticated ? <><Check size={14} /> Ready</> : 'Needs attention'}</span></div><div className="connection-readout"><div><span>Intelligence</span><strong>gpt-5.6-luna</strong></div><div><span>Reasoning</span><strong>Low</strong></div><div><span>Codex CLI</span><strong>{status?.version || 'Not detected'}</strong></div></div><label className="field-label">Codex executable</label><div className="binary-row"><code>{status?.binary || 'codex'}</code><button className="secondary-button" onClick={async () => { await window.starling.codex.chooseBinary(); check() }}>Choose…</button><button className="secondary-button" onClick={check} disabled={checking}>{checking ? <LoaderCircle className="spin" size={16} /> : <RefreshCw size={16} />} Check</button></div>{status && !status.available && <p className="inline-warning">Install the Codex CLI, then choose its executable here. Run <code>codex login</code> once before chatting.</p>}{status?.available && !status.authenticated && <p className="inline-warning">Codex is installed but does not appear to be signed in. Run <code>codex login</code> in a terminal.</p>}</section><section className="settings-section"><div className="settings-heading"><div><h2>Your profile</h2><p>This name appears beside your messages and can be referenced by characters.</p></div></div><label className="field-label" htmlFor="user-name">Display name</label><input id="user-name" className="text-input compact-input" value={vault.userName} onChange={(event) => setVault((current) => ({ ...current, userName: event.target.value }))} /></section><section className="settings-section"><div className="settings-heading"><div><h2>Archive data</h2><p>Characters, lore, worlds, rooms, and threads are stored locally on this computer.</p></div></div><div className="button-row"><button className="secondary-button" onClick={exportData}><Download size={16} /> Export archive</button><button className="secondary-button" onClick={importData}><Import size={16} /> Import archive</button></div>{notice && <p className="success-note"><Check size={15} /> {notice}</p>}</section><PrivacyNote /></div>
+  return <div className="settings-layout"><section className="settings-section"><div className="settings-heading"><div><h2>Codex connection</h2><p>Starling calls the local Codex CLI with a locked model and reasoning profile.</p></div><span className={`status-pill ${status?.available && status.authenticated ? 'ok' : 'warn'}`}>{status?.available && status.authenticated ? <><Check size={14} /> Ready</> : 'Needs attention'}</span></div><div className="connection-readout"><div><span>Intelligence</span><strong>gpt-5.6-luna</strong></div><div><span>Reasoning</span><strong>Low</strong></div><div><span>Codex CLI</span><strong>{status?.version || 'Not detected'}</strong></div></div><label className="field-label">Codex executable</label><div className="binary-row"><code>{status?.binary || 'codex'}</code><button className="secondary-button" onClick={async () => { await window.starling.codex.chooseBinary(); check() }}>Choose…</button><button className="secondary-button" onClick={check} disabled={checking}>{checking ? <LoaderCircle className="spin" size={16} /> : <RefreshCw size={16} />} Check</button></div>{status && !status.available && <p className="inline-warning">Install the Codex CLI, then choose its executable here. Run <code>codex login</code> once before chatting.</p>}{status?.available && !status.authenticated && <p className="inline-warning">Codex is installed but does not appear to be signed in. Run <code>codex login</code> in a terminal.</p>}</section><UpdateSection /><section className="settings-section"><div className="settings-heading"><div><h2>Your profile</h2><p>This name appears beside your messages and can be referenced by characters.</p></div></div><label className="field-label" htmlFor="user-name">Display name</label><input id="user-name" className="text-input compact-input" value={vault.userName} onChange={(event) => setVault((current) => ({ ...current, userName: event.target.value }))} /></section><section className="settings-section"><div className="settings-heading"><div><h2>Archive data</h2><p>Characters, lore, worlds, rooms, and threads are stored locally on this computer.</p></div></div><div className="button-row"><button className="secondary-button" onClick={exportData}><Download size={16} /> Export archive</button><button className="secondary-button" onClick={importData}><Import size={16} /> Import archive</button></div>{notice && <p className="success-note"><Check size={15} /> {notice}</p>}</section><PrivacyNote /></div>
+}
+
+function UpdateSection() {
+  const [appInfo, setAppInfo] = useState<AppInfo | null>(null)
+  const [updating, setUpdating] = useState(false)
+  const [status, setStatus] = useState('Check GitHub and install the newest release without leaving Starling.')
+  const [progress, setProgress] = useState(0)
+
+  useEffect(() => {
+    window.starling.app.info().then(setAppInfo)
+    return window.starling.app.onUpdateProgress((update: UpdateProgress) => {
+      const messages: Record<UpdateProgress['phase'], string> = {
+        starting: `Preparing version ${update.latestVersion || ''}…`,
+        downloading: `Downloading update${update.percent ? ` · ${update.percent}%` : ''}…`,
+        verifying: 'Verifying the release checksum…',
+        preparing: 'Preparing the new application…',
+        installing: 'Installing and restarting Starling Archive…',
+      }
+      setStatus(messages[update.phase])
+      setProgress(update.phase === 'starting' ? 3 : Number.isFinite(update.percent) ? update.percent! : 100)
+    })
+  }, [])
+
+  const install = async () => {
+    setUpdating(true)
+    setProgress(3)
+    setStatus('Checking the latest GitHub release…')
+    try {
+      const result = await window.starling.app.installUpdate()
+      if (!result.available) {
+        setStatus(`Version ${result.currentVersion} is already the latest release.`)
+        setProgress(100)
+        setUpdating(false)
+      } else if (result.installing) {
+        setStatus(`Installing version ${result.latestVersion}; Starling Archive will restart automatically.`)
+      }
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'The update could not be installed.')
+      setProgress(0)
+      setUpdating(false)
+    }
+  }
+
+  return <section className="settings-section update-section"><div className="settings-heading"><div><h2>Desktop updates</h2><p>{status}</p></div><span className="version-badge">Version {appInfo?.version || '—'} · {appInfo?.arch || 'detecting'}</span></div><div className="update-progress" aria-hidden="true"><i style={{ width: `${progress}%` }} /></div><button className="primary-button update-button" onClick={install} disabled={updating}><Download size={16} /> {updating ? 'Updating…' : 'Update to latest release'}</button></section>
 }
 
 function PrivacyNote() {

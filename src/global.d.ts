@@ -1,4 +1,4 @@
-import type { CodexStatus, Vault } from './types'
+import type { AppInfo, CodexStatus, UpdateProgress, UpdateResult, Vault, WeatherInfo } from './types'
 
 declare global {
   interface Window {
@@ -18,7 +18,11 @@ declare global {
       app: {
         platform: string
         version: () => Promise<string>
+        info: () => Promise<AppInfo>
         openExternal: (url: string) => Promise<boolean>
+        installUpdate: () => Promise<UpdateResult>
+        currentWeather: (force?: boolean) => Promise<WeatherInfo>
+        onUpdateProgress: (callback: (progress: UpdateProgress) => void) => () => void
       }
     }
   }

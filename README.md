@@ -14,6 +14,8 @@ Starling Archive is a local-first Electron studio for creating AI characters, mo
 - Direct rooms containing multiple characters and generate exactly one selected speaker at a time.
 - Create, rename, resume, and delete conversation and role-playing threads.
 - Store the archive locally and import or export a portable JSON backup.
+- See the current Huntsville, Alabama time and weather at a glance.
+- Download, verify, install, and restart into the latest GitHub release from Settings.
 - Use the built-in About page as a complete field guide.
 
 ## Intelligence and privacy
@@ -55,6 +57,12 @@ npm run dist:win       # Windows installer and portable app
 ```
 
 Tagged releases (`v*`) trigger a GitHub Actions matrix that builds unsigned Windows and macOS downloads. Operating systems may warn about unsigned builds; production distribution should add code-signing credentials.
+
+## Desktop updates
+
+Open **Settings → Desktop updates → Update to latest release**. Starling selects the matching Apple Silicon, Intel Mac, or Windows installer from the latest GitHub release, verifies its published SHA-256 digest, installs it, and restarts. Automatic updates require a packaged copy of the app and an internet connection.
+
+The weather widget requests only Huntsville's current conditions from Open-Meteo and keeps a short in-memory cache so the app remains usable during a temporary network interruption.
 
 ## Product research
 
