@@ -1,6 +1,6 @@
 {
   "name": "starling-archive",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A local-first Electron studio for AI characters, shared lore, rooms, and role-playing scenarios powered by Codex Luna.",
   "main": "electron/main.cjs",
   "author": "Nicholas Benson",
@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5173 electron .\"",
     "build": "tsc --noEmit && vite build",
-    "test": "vitest run",
+    "test": "vitest run && node --test electron/services.test.cjs",
     "test:watch": "vitest",
     "test:electron": "npm run build && node scripts/electron-smoke.mjs",
     "preview": "vite preview --host 127.0.0.1",

@@ -54,11 +54,26 @@ button:disabled { opacity: .45; cursor: not-allowed !important; }
 .nav-button span:not(.nav-indicator) { font-size: 13px; font-weight: 560; }
 .nav-indicator { position: absolute; left: 0; width: 2px; height: 21px; border-radius: 3px; background: var(--lavender); box-shadow: 0 0 12px var(--violet); }
 .sidebar-bottom { margin-top: auto; display: grid; gap: 3px; }
-.model-chip { margin: 14px 5px 0; padding: 13px 12px; display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--line); }
+.model-chip { margin: 0 5px; padding: 12px; display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--line); }
 .model-chip > div { display: grid; gap: 2px; }
 .model-chip strong { font-size: 11px; font-weight: 650; }
 .model-chip small { font-size: 10px; color: var(--dim); }
 .live-dot { width: 7px; height: 7px; display: inline-block; border-radius: 50%; background: #7de0bb; box-shadow: 0 0 10px rgba(125, 224, 187, .65); flex: 0 0 auto; }
+.huntsville-widget { margin: 9px 5px 0; padding: 12px; border-top: 1px solid var(--line); background: linear-gradient(135deg, rgba(129,116,242,.065), transparent); }
+.huntsville-location { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.huntsville-location > span, .huntsville-widget > small { color: var(--dim); font-size: 7px; font-weight: 650; letter-spacing: .11em; text-transform: uppercase; }
+.huntsville-location button { width: 25px; height: 25px; display: grid; place-items: center; flex: 0 0 auto; padding: 0; border: 1px solid var(--line); border-radius: 50%; color: var(--lavender); background: transparent; cursor: pointer; }
+.huntsville-location button:hover { border-color: rgba(185,178,255,.34); background: rgba(129,116,242,.12); }
+.huntsville-widget time { display: block; margin-top: 5px; color: #f4f1fa; font: 10px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .015em; white-space: nowrap; }
+.weather-reading { display: grid; grid-template-columns: 18px auto minmax(0,1fr); align-items: center; gap: 7px; margin-top: 9px; color: var(--gold); }
+.weather-reading strong { color: #f6f3ff; font: 14px ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 600; }
+.weather-reading span { overflow: hidden; color: var(--lavender); font-size: 8px; white-space: nowrap; text-overflow: ellipsis; }
+.huntsville-widget > small { display: block; margin-top: 7px; font-size: 6px; }
+.huntsville-widget[data-weather-tone="cloud"] .weather-reading, .huntsville-widget[data-weather-tone="fog"] .weather-reading { color: var(--lavender); }
+.huntsville-widget[data-weather-tone="rain"] .weather-reading { color: var(--blue); }
+.huntsville-widget[data-weather-tone="storm"] .weather-reading { color: #a875ff; }
+.huntsville-widget[data-weather-tone="snow"] .weather-reading, .huntsville-widget[data-weather-tone="ice"] .weather-reading { color: #88e6ff; }
+.huntsville-widget[data-weather-tone="unknown"] .weather-reading { color: var(--muted); }
 
 .main-content { height: 100%; min-width: 0; overflow: auto; }
 .main-content:not(.chat-main) { padding: 62px clamp(44px, 5.5vw, 90px) 80px; }
@@ -257,6 +272,10 @@ textarea.text-input { padding: 11px 12px; resize: vertical; }
 .text-input:focus { border-color: rgba(129,116,242,.55); outline: none; box-shadow: 0 0 0 3px rgba(129,116,242,.08); }
 .compact-input { max-width: 420px; }
 .success-note { display: flex; align-items: center; gap: 7px; margin: 14px 0 0; color: #86d9bd; font-size: 9px; }
+.version-badge { flex: 0 0 auto; padding: 7px 9px; border: 1px solid var(--line); border-radius: 20px; color: var(--muted); font-size: 8px; letter-spacing: .07em; text-transform: uppercase; }
+.update-progress { height: 3px; overflow: hidden; background: rgba(185,178,255,.09); }
+.update-progress i { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--violet), var(--blue), var(--gold)); transition: width .25s ease; }
+.update-button { width: 100%; margin-top: 16px; }
 .privacy-note { display: flex; gap: 13px; padding: 22px 26px; color: var(--lavender); background: linear-gradient(100deg, rgba(129,116,242,.09), rgba(84,168,255,.03)); }
 .privacy-note div { display: grid; gap: 4px; }
 .privacy-note strong { font-family: 'Cormorant Garamond', serif; font-size: 18px; }

@@ -1,10 +1,14 @@
-const { app, BrowserWindow, dialog, ipcMain, shell } = require('electron')
+const { app, BrowserWindow, dialog, ipcMain, net, shell } = require('electron')
 const { spawn } = require('node:child_process')
 const { access, mkdir, readFile, rename, writeFile } = require('node:fs/promises')
 const path = require('node:path')
 const os = require('node:os')
+const { DesktopUpdateService } = require('./update-service.cjs')
+const { WeatherService } = require('./weather-service.cjs')
 
 let mainWindow
+let updateService
+let weatherService
 
 const databasePath = () => path.join(app.getPath('userData'), 'starling-archive.json')
 const preferencesPath = () => path.join(app.getPath('userData'), 'preferences.json')
@@ -48,6 +52,8 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  updateService = new DesktopUpdateService(app, (...args) => net.fetch(...args))
+  weatherService = new WeatherService((...args) => net.fetch(...args))
   createWindow()
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow() })
 })
@@ -182,6 +188,16 @@ ipcMain.handle('codex:generate', async (_event, request) => {
 })
 
 ipcMain.handle('app:version', () => app.getVersion())
+ipcMain.handle('app:info', () => ({
+  version: app.getVersion(),
+  platform: process.platform,
+  arch: process.arch,
+  packaged: app.isPackaged,
+}))
+ipcMain.handle('update:install', () => updateService.downloadAndInstall((progress) => {
+  if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('update:progress', progress)
+}))
+ipcMain.handle('weather:current', (_event, force = false) => weatherService.current(Boolean(force)))
 ipcMain.handle('app:open-external', async (_event, url) => {
   if (!/^https:\/\//.test(url)) throw new Error('Only secure web links can be opened.')
   await shell.openExternal(url)

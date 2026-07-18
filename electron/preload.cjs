@@ -16,6 +16,14 @@ contextBridge.exposeInMainWorld('starling', {
   app: {
     platform: process.platform,
     version: () => ipcRenderer.invoke('app:version'),
+    info: () => ipcRenderer.invoke('app:info'),
     openExternal: (url) => ipcRenderer.invoke('app:open-external', url),
+    installUpdate: () => ipcRenderer.invoke('update:install'),
+    currentWeather: (force = false) => ipcRenderer.invoke('weather:current', force),
+    onUpdateProgress: (callback) => {
+      const listener = (_event, progress) => callback(progress)
+      ipcRenderer.on('update:progress', listener)
+      return () => ipcRenderer.removeListener('update:progress', listener)
+    },
   },
 })

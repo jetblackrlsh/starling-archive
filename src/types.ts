@@ -83,6 +83,41 @@ export interface CodexStatus {
   detail: string
 }
 
+export interface AppInfo {
+  version: string
+  platform: string
+  arch: string
+  packaged: boolean
+}
+
+export interface WeatherInfo {
+  location: string
+  timeZone: string
+  temperature: number
+  temperatureUnit: string
+  condition: string
+  tone: 'clear' | 'cloud' | 'fog' | 'rain' | 'storm' | 'snow' | 'ice' | 'unknown'
+  isDay: boolean
+  observedAt: string
+  fetchedAt: string
+  cached: boolean
+  stale?: boolean
+}
+
+export interface UpdateProgress {
+  phase: 'starting' | 'downloading' | 'verifying' | 'preparing' | 'installing'
+  percent?: number
+  latestVersion?: string
+}
+
+export interface UpdateResult {
+  currentVersion: string
+  latestVersion: string
+  available: boolean
+  installing: boolean
+  releaseUrl?: string
+}
+
 export type NavigationView = 'home' | 'characters' | 'lore' | 'scenarios' | 'rooms' | 'threads' | 'settings' | 'about' | 'chat'
 
 export interface GenerationContext {
