@@ -1,10 +1,9 @@
-name: Build desktop apps
+name: Build desktop apps for release
 
 on:
-  workflow_dispatch:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types:
+      - published
 
 permissions:
   contents: write
@@ -21,31 +20,42 @@ jobs:
           - os: windows-latest
             command: npm run dist:win
             artifact: Windows
+
     runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+
       - run: npm ci
       - run: npm test
+
       - run: ${{ matrix.command }}
         env:
-          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
-      - uses: actions/upload-artifact@v4
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+
+      - name: Attach files to the published release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          mapfile -d '' files < <(find release -maxdepth 1 -type f \( -name '*.dmg' -o -name '*.zip' -o -name '*.exe' \) -print0)
+          gh release upload "$RELEASE_TAG" "${files[@]}" --clobber --repo "$GITHUB_REPOSITORY"
+
+      - name: Keep a temporary Actions copy
+        uses: actions/upload-artifact@v4
         with:
-          name: Starling-Archive-${{ matrix.artifact }}
+          name: Starling-Archive-${{ matrix.artifact }}-${{ github.event.release.tag_name }}
           path: |
             release/*.dmg
             release/*.zip
             release/*.exe
           if-no-files-found: error
-      - name: Attach files to GitHub release
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            release/*.dmg
-            release/*.zip
-            release/*.exe
+          retention-days: 3
