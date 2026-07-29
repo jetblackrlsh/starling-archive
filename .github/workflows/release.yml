@@ -1,23 +1,64 @@
-name: Delete existing Actions artifacts
+name: Build desktop apps for release
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types:
+      - published
 
 permissions:
-  actions: write
-  contents: read
+  contents: write
 
 jobs:
-  cleanup:
-    runs-on: ubuntu-latest
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            command: npm run dist:mac
+            artifact: macOS
+          - os: windows-latest
+            command: npm run dist:win
+            artifact: Windows
+
+    runs-on: ${{ matrix.os }}
+
     steps:
-      - name: Delete every active artifact in this repository
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm test
+
+      - run: ${{ matrix.command }}
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+
+      - name: Attach files to the published release
+        shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          gh api --paginate "/repos/$GITHUB_REPOSITORY/actions/artifacts?per_page=100" --jq '.artifacts[] | select(.expired == false) | .id' |
-            while read -r artifact_id; do
-              gh api --method DELETE "/repos/$GITHUB_REPOSITORY/actions/artifacts/$artifact_id"
-            done
+          files=()
+          while IFS= read -r -d '' file; do
+            files+=("$file")
+          done < <(find release -type f \( -name '*.dmg' -o -name '*.zip' -o -name '*.exe' \) -print0)
+          gh release upload "$RELEASE_TAG" "${files[@]}" --clobber --repo "$GITHUB_REPOSITORY"
+
+      - name: Keep a temporary Actions copy
+        uses: actions/upload-artifact@v4
+        with:
+          name: Starling-Archive-${{ matrix.artifact }}-${{ github.event.release.tag_name }}
+          path: |
+            release/*.dmg
+            release/*.zip
+            release/*.exe
+          if-no-files-found: error
+          retention-days: 3
